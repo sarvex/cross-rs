@@ -284,10 +284,11 @@ def test_recurse():
 
     cc_test = ast[4]
     assert cc_test.name == 'cc_test'
-    seen = []
-    for (key, value, depth, parent) in cc_test.map.recurse():
-        if depth > 1 and parent.is_map():
-            seen.append(key)
+    seen = [
+        key
+        for key, value, depth, parent in cc_test.map.recurse()
+        if depth > 1 and parent.is_map()
+    ]
     assert seen == ['array', 'option']
 
 

@@ -260,7 +260,7 @@ def test_split_comments():
     blocks = make._split_comments('')
     assert len(blocks) == 0
     assert repr(blocks) == 'BlockList()'
-    assert str(blocks) == ''
+    assert not str(blocks)
 
 
 def test_block():

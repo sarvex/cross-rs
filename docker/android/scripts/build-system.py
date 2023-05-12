@@ -31,13 +31,13 @@ def print_verbose(message, verbose):
 
 
 def backup(src, args, *_):
-    dst = src + '.bak'
+    dst = f'{src}.bak'
     print_verbose(f'creating backup of file "{src}" at "{dst}"', args.verbose)
     shutil.copy2(src, dst)
 
 
 def restore(dst, args, *_):
-    src = dst + '.bak'
+    src = f'{dst}.bak'
     if os.path.exists(src):
         print_verbose(f'restoring from backup "{src}" to "{dst}"', args.verbose)
         shutil.copy2(src, dst)
@@ -62,7 +62,7 @@ def item_op(item, remove):
     elif item.is_list():
         return filter_list(item, remove)
     elif item.is_string() or item.is_binary_operator():
-        return item.str_op(lambda y: not any(i in y.lower() for i in remove))
+        return item.str_op(lambda y: all(i not in y.lower() for i in remove))
     raise TypeError(f'got unexpected type of {type(item)}')
 
 
@@ -84,10 +84,7 @@ def remove_soong_tests(path, args, *_):
         map = None
         if not node.is_scope() and not node.expr.is_map():
             continue
-        if node.is_scope():
-            map = node.map
-        else:
-            map = node.expr
+        map = node.map if node.is_scope() else node.expr
         test_names = ('libgtest', 'test-proto', 'starlarktest')
         for key, value, *_ in map.recurse():
             if value.value.is_list():
@@ -110,7 +107,7 @@ def remove_makefile_tests(path, args, *_):
 
 
 def remove_tests(path, args, processor):
-    if os.path.exists(path + '.bak'):
+    if os.path.exists(f'{path}.bak'):
         restore(path, args)
     elif not args.disable_backup:
         backup(path, args)

@@ -454,7 +454,7 @@ class Map(dict, Node):
         elif pretty:
             result += '\n'
             for pair in pairs:
-                result += _indent(indent, depth + 1) + f'{pair},\n'
+                result += f'{_indent(indent, depth + 1)}{pair},\n'
             result += _indent(indent, depth) + '}'
         else:
             result += ', '.join(pairs) + '}'
@@ -466,9 +466,7 @@ class Map(dict, Node):
 
     def is_art_check(self):
         name = self.get('name')
-        if name is None:
-            return False
-        return 'art-check' in name.value.lower()
+        return False if name is None else 'art-check' in name.value.lower()
 
     def is_test(self):
         name = self.get('name')
@@ -481,9 +479,7 @@ class Map(dict, Node):
 
     def is_benchmark(self):
         name = self.get('name')
-        if name is None:
-            return False
-        return util.is_benchmark(name.value)
+        return False if name is None else util.is_benchmark(name.value)
 
     def is_dev(self):
         return self.is_test() or self.is_benchmark()
@@ -514,14 +510,15 @@ class List(list, Node):
             if x.is_map():
                 return x.to_str(pretty, indent, depth)
             return x.to_str(pretty, indent, depth + 1)
+
         result = '['
         if len(self) <= 1 or not pretty:
             result += ', '.join([fmt(i) for i in self]) + ']'
         else:
             result += '\n'
             for element in self:
-                result += _indent(indent, depth + 1) + f'{fmt(element)},\n'
-            result += _indent(indent, depth) + ']'
+                result += f'{_indent(indent, depth + 1)}{fmt(element)},\n'
+            result += f'{_indent(indent, depth)}]'
 
         return result
 
@@ -557,9 +554,7 @@ class MapValue(Node):
 
     def to_str(self, pretty=True, indent=4, depth=0):
         value = self.value.to_str(pretty, indent, depth)
-        if self.delimiter == '=':
-            return f' = {value}'
-        return f': {value}'
+        return f' = {value}' if self.delimiter == '=' else f': {value}'
 
     def str_op(self, cmp):
         return self.value.str_op(cmp)
@@ -600,10 +595,7 @@ class String(str, Node):
         return super().__str__()[1:-1]
 
     def __eq__(self, other):
-        if type(other) is String:
-            return str(self) == str(other)
-        # we want to be compare equal to the string's value
-        return str(self) == other
+        return str(self) == str(other) if type(other) is String else str(self) == other
 
     def __ne__(self, other):
         # need to override `__ne__` which normally uses a pyslot

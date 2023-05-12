@@ -180,7 +180,7 @@ class Block(str, Node):
 class BlockList(list, Node):
     def __init__(self, *args, **kwds):
         super().__init__(*args, **kwds)
-        assert all([isinstance(i, Node) for i in self])
+        assert all(isinstance(i, Node) for i in self)
 
     @property
     def child(self):
@@ -371,7 +371,7 @@ def _split_comments(contents):
         return blocks
 
     matches = list(re.finditer(pattern, contents))
-    if len(matches) == 0:
+    if not matches:
         blocks.append(Block(contents))
     else:
         first = matches[0]
